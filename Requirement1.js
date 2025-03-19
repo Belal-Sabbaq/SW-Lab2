@@ -1,5 +1,11 @@
 var i = [], t = [], c = [], f = {};
 
+function checkLowStock(item){
+    if(item.qty<10){
+        console.log(`Alert: Item ${item.n} is below 10 units! Current quantitiy : ${item.qty}`);
+    }
+
+}
 function doStuff(a, b) {
     if (["add", "edit", "rmI"].includes(a)) {
         if (a === "add") {
@@ -7,12 +13,15 @@ function doStuff(a, b) {
             i.push(itm);
             if (!c.includes(b[1])) c.push(b[1]);
             t.push({ type: "add", itm });
+            checkLowStock(itm)
         } else if (a === "edit" && i[b[0]]) {
             t.push({ type: "edit", old: i[b[0]], new: b.slice(1) });
             i[b[0]] = { ...i[b[0]], n: b[1], cat: b[2], qty: b[3], prc: b[4], unt: b[5], custF: b[6] || {} };
+            checkLowStock(itm)
         } else if (a === "rmI" && i[b[0]]) {
             t.push({ type: "delete", itm: i[b[0]] });
             i.splice(b[0], 1);
+            checkLowStock(itm)
         }
         console.log("=== Dashboard ===\nItems: " + i.length + "\nTotal: $" + i.reduce((tot, x) => tot + x.qty * x.prc, 0).toFixed(2) + "\nCats: " + c.join(', '));
     }
@@ -23,10 +32,12 @@ function doStuff(a, b) {
                     k.qty -= b[1];
                     t.push({ type: "sale", itm: k, qtyS: b[1], d: new Date() });
                     console.log(`Sold ${b[1]} ${k.unt} of ${k.n}`);
+                    checkLowStock(k);
                 } else if (a === "rstck") {
                     k.qty += b[1];
                     t.push({ type: "restock", itm: k, qtyR: b[1], d: new Date() });
                     console.log(`Restocked ${b[1]} ${k.unt} of ${k.n}`);
+                    checkLowStock(k);
                 }
                 break;
             }
